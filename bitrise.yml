@@ -36,6 +36,9 @@ app:
   envs:
     - XCODEBUILD_PROJECT: ./CarRecognition.xcodeproj
     - XCODEBUILD_OPTIONS: _BUILD_NUMBER=$BITRISE_BUILD_NUMBER
+    - AWS_REGION: $AWS_REGION
+    - AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
 
 
 # Workflow declarations.
@@ -97,6 +100,8 @@ workflows:
     envs:
       - XCODEBUILD_SCHEME: Staging
     before_run:
+      - install-rome
+      - rome-list-missing
       - cache-pull
       - bootstrap-carthage
       - bootstrap-cocoapods-keys
@@ -125,9 +130,26 @@ workflows:
                 ./Carthage
                 ./Pods
 
+  # Install Rome
+  
+  install-rome:
+    steps:
+    - script:
+        inputs:
+        - content: |
+            #!/bin/bash
+            brew install blender/homebrew-tap/rome
+
+  # List missing dependencies using Carthage Rome
+
+  rome-list-missing:
+    steps:
+      - script:
+          title: 'rome-list-missing'
+          inputs:
+            - content: rome list --missing
+
   # Bootstrap dependencies using Carthage package manager.
-  #
-  # If you don't use this package manager, you can remove this workflow.
 
   bootstrap-carthage:
     steps:
