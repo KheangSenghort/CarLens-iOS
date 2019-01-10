@@ -22,6 +22,9 @@ trigger_map:
   - push_branch: master
     workflow: build-release-candidate
 
+  - push_branch: rnd/rome
+    workflow: run-rome
+
   - pull_request_target_branch: develop
     workflow: build-pull-request
 
@@ -109,6 +112,13 @@ workflows:
     after_run:
       - cache-push
       - deploy-bitriseio
+
+  # Test rome integration.
+
+  run-rome:
+    before_run:
+      - install-rome
+      - rome-list-missing
 
   # Pull previously cached directories.
 
