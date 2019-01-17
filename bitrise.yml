@@ -118,7 +118,8 @@ workflows:
   run-rome:
     before_run:
       - install-rome
-      - rome-list-missing
+      - rome-list-and-install-missing
+      - rome-upload-missing
 
   # Pull previously cached directories.
 
@@ -158,6 +159,20 @@ workflows:
           title: 'rome-list-missing'
           inputs:
             - content: rome list --missing
+
+  rome-list-and-install-missing:
+    steps:
+      - script:
+          title: 'rome-list-and-install-missing'
+          inputs:
+            - content: rome list --missing --platform ios | awk '{print $1}' | xargs carthage update --platform ios --cache-builds
+
+  rome-upload-missing:
+    steps:
+      - script:
+          title: 'rome-upload-missing'
+          inputs:
+            - content: rome list --missing --platform ios | awk '{print $1}' | xargs rome upload --platform ios
 
   # Bootstrap dependencies using Carthage package manager.
 
